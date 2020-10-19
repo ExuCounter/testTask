@@ -5,10 +5,12 @@ const app = express();
 const config = require('config');
 const PORT = config.get('PORT');
 // Routes
-const apiRouter = require('./routes/api/apiRouter');
+const usersRouter = require('./routes/usersRoutes');
+// Fetch
+global.fetch = require('node-fetch');
 
 // API Router middleware
-app.use('/api/v1', apiRouter)
+app.use('/', usersRouter)
 
 // Listen port
 app.listen(PORT, () => {
