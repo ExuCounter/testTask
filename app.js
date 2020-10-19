@@ -13,6 +13,8 @@ global.fetch = require('node-fetch');
 // Cache middleware
 const { updateCache } = require('./middlewares/cacheMiddleware');
 
+// Cache middleware
+app.use(updateCache);
 // Users Router middleware
 app.use('/', usersRouter)
 
