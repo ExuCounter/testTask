@@ -1,0 +1,14 @@
+{
+  "name": "testtask",
+  "version": "1.0.0",
+  "description": "Test API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Volodymyr Potiichuk",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
