@@ -23,14 +23,15 @@ const getListOfUsers = async(req, res) => {
         for (user of data) {
             const { id } = user;
             const { data, included } = await getUserById(id); // Receive object with user info
-            const { name, from, email, links: { orders } } = data; // User info destructuring
+            const { name, from, email, links: { orders }, createdAt: userCreatedAt } = data; // User info destructuring
             // Update orders array according to the task
             const ordersArray = [];
             if (orders.length > 0) {
                 orders.map((order, index) => {
                     const { id } = order; // Order Id
-                    const { price, currency, status } = included.orders[index];
-                    ordersArray.push({ id, price, currency, status });
+                    const { price, currency, status, updatedAt: orderUpdatedAt } = included.orders[index];
+                    const timeToOrderAfterRegister = `${new Date(orderUpdatedAt) - new Date(userCreatedAt)} milliseconds`;
+                    ordersArray.push({ id, price, currency, status, timeToOrderAfterRegister });
                 })
             }
             usersArray.push({
@@ -49,17 +50,6 @@ const getListOfUsers = async(req, res) => {
 
 // Get user by id
 const getUserById = async(id) => {
-    try {
-        const url = `https://api.stage.leeloo.ai/api/v1/accounts/${id}?include=contactedUsers,orders`;
-        const data = await request(url, 'GET', null, { 'X-Leeloo-AuthToken': authToken });
-        return data;
-    } catch (error) {
-        return 'User do not exist'
-    }
-}
-
-// Get order by id
-const getOrderById = async(id) => {
     try {
         const url = `https://api.stage.leeloo.ai/api/v1/accounts/${id}?include=contactedUsers,orders`;
         const data = await request(url, 'GET', null, { 'X-Leeloo-AuthToken': authToken });
