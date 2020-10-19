@@ -5,6 +5,11 @@ const usersRouter = express.Router();
 const usersController = require('../controllers/usersController');
 const { getListOfUsers } = usersController;
 
-usersRouter.get('/', getListOfUsers)
+// Temporary redirect to list of users
+usersRouter.get('/', (req, res) => {
+    res.redirect(301, '/get-list-of-users');
+})
+
+usersRouter.get('/get-list-of-users/', getListOfUsers);
 
 module.exports = usersRouter;
