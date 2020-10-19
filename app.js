@@ -10,6 +10,8 @@ const fs = require('fs');
 const usersRouter = require('./routes/usersRoutes');
 // Fetch
 global.fetch = require('node-fetch');
+// Cache middleware
+const { updateCache } = require('./middlewares/cacheMiddleware');
 
 // Users Router middleware
 app.use('/', usersRouter)

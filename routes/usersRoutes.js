@@ -4,9 +4,12 @@ const usersRouter = express.Router();
 // Users Controller
 const usersController = require('../controllers/usersController');
 const { getListOfUsers } = usersController;
-// Update Cache
-const { updateCache } = require('../middlewares/cacheMiddleware');
 
-usersRouter.get('/', updateCache, getListOfUsers);
+usersRouter.get('/', (res, req, next) => {
+    res.redirect('/get-list-of-users');
+    next();
+})
+
+usersRouter.get('/get-list-of-users', getListOfUsers);
 
 module.exports = usersRouter;

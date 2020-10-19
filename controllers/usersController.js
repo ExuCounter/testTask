@@ -15,9 +15,8 @@ const request = async(url, method = 'GET', body = null, headers = { 'X-Leeloo-Au
 }
 
 // Get Users List
-const getListOfUsers = async(req, res) => {
+const getListOfUsers = async(req, res, next) => {
     try {
-        console.log('lol');
         const { offset } = req.query;
 
         const offsetNumber = offset || 0;
@@ -38,7 +37,7 @@ const getListOfUsers = async(req, res) => {
                 updatedOrders = orders.map((order, index) => {
                     const { id } = order; // Order Id
                     const { price, currency, status, updatedAt: orderUpdatedAt } = included.orders[index];
-                    const timeToOrderAfterRegister = new Date(orderUpdatedAt) - new Date(userCreatedAt);
+                    const timeToOrderAfterRegister = Math.floor((new Date(orderUpdatedAt) - new Date(userCreatedAt)) / 1000);
 
                     return { id, price, currency, status, timeToOrderAfterRegister }
                 })
