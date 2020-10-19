@@ -9,7 +9,7 @@ const usersRouter = require('./routes/usersRoutes');
 // Fetch
 global.fetch = require('node-fetch');
 
-// API Router middleware
+// Users Router middleware
 app.use('/', usersRouter)
 
 // Listen port
