@@ -4,6 +4,8 @@ const app = express();
 // Config
 const config = require('config');
 const PORT = config.get('PORT');
+// File System
+const fs = require('fs');
 // Routes
 const usersRouter = require('./routes/usersRoutes');
 // Fetch

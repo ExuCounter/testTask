@@ -17,6 +17,7 @@ const request = async(url, method = 'GET', body = null, headers = { 'X-Leeloo-Au
 // Get Users List
 const getListOfUsers = async(req, res) => {
     try {
+        console.log('lol');
         const { offset } = req.query;
 
         const offsetNumber = offset || 0;
@@ -51,7 +52,7 @@ const getListOfUsers = async(req, res) => {
                 orders: updatedOrders
             });
         }
-        res.status(200).send(usersArray)
+        res.status(200).send(usersArray);
     } catch (error) {
         res.status(500).send(error.message);
     }
