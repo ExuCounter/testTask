@@ -17,43 +17,70 @@ const request = async(url, method = 'GET', body = null, headers = { 'X-Leeloo-Au
 
 // Get list of users
 const getListOfUsers = async(req, res, next) => {
+    let usersInfo = [];
     try {
         const { offset } = req.query;
         const offsetNumber = offset || 0;
         const url = `${API_URL}accounts?offset=${offsetNumber}&limit=${RESULTS_PER_PAGE}`;
+
         const { data } = await request(url);
+        try {
+            const usersRequests = data.map(user => getUserById(user.id));
+            const users = await Promise.all(usersRequests);
 
-        const usersRequests = data.map(user => getUserById(user.id));
-        const users = await Promise.all(usersRequests);
+            usersInfo = users.map((user, index) => {
+                try {
+                    const { data, included } = user;
+                    const { id, name, from, email, links, createdAt: userCreatedAt } = data;
+                    const { orders } = links || {};
+                    if (!id) {
+                        throw new Error('Invalid user ID');
+                    }
 
-        let usersInfo = users.map(user => {
-            const { data, included } = user;
-            const { id, name, from, email, links, createdAt: userCreatedAt } = data;
-            const { orders } = links;
+                    let updatedOrders = [];
+                    if (orders && orders.length > 0) {
+                        updatedOrders = orders.map((order, index) => {
+                            try {
+                                let { id } = order;
 
-            let updatedOrders;
-            if (orders.length > 0) {
-                updatedOrders = orders.map((order, index) => {
-                    const { id } = order;
-                    const { price, currency, status, updatedAt: orderUpdatedAt } = included.orders[index];
-                    const timeToOrderAfterRegister = Math.floor((new Date(orderUpdatedAt) - new Date(userCreatedAt)) / 1000);
+                                if (!id) {
+                                    throw new Error('Invalid order ID');
+                                }
 
-                    return { id, price, currency, status, timeToOrderAfterRegister }
-                })
-            }
+                                let { price, currency, status, updatedAt: orderUpdatedAt } = included.orders[index];
+                                const timeToOrderAfterRegister = Math.floor((new Date(orderUpdatedAt) - new Date(userCreatedAt)) / 1000);
 
-            return {
-                id,
-                name,
-                from,
-                email,
-                orders: updatedOrders
-            }
-        })
+                                return { id, price, currency, status, timeToOrderAfterRegister }
+                            } catch (error) {
+                                return {
+                                    id: 'Invalid detail information with order ID'
+                                }
+                            }
+                        })
+                    }
 
-        res.status(200).send(usersInfo);
+                    return {
+                        id,
+                        name: name || "NOT_DEFINED",
+                        from: from || "NOT_DEFINED",
+                        email: email || "NOT_DEFINED",
+                        orders: updatedOrders
+                    }
+                } catch (error) {
+                    return {
+                        id: 'Invalid user ID'
+                    }
+                }
+            })
+        } catch (error) {
+            console.error('Invalid users requests');
+            throw new Error('Invalid users requests');
+        }
     } catch (error) {
-        res.status(500).send(error.message);
+        console.error('Invalid request for list of the users')
+        res.status(400).send([]);
+    } finally {
+        res.status(200).send(usersInfo);
     }
 }
 
@@ -64,7 +91,7 @@ const getUserById = async(id) => {
         const data = await request(url, 'GET', null, { 'X-Leeloo-AuthToken': authToken });
         return data;
     } catch (error) {
-        throw new Error('User do not exist');
+        throw new Error('User with such id: ' + id + ' do not exist');
     }
 }
 
