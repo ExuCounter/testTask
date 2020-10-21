@@ -3,7 +3,8 @@ const authToken = config.get('authToken');
 const { SETTINGS } = require('../config/constants');
 const { API_URL, RESULTS_PER_PAGE } = SETTINGS;
 
-// Common fetch request
+
+// Common fetch query
 const request = async(url, method = 'GET', body = null, headers = { 'X-Leeloo-AuthToken': authToken }) => {
     try {
         const data = await fetch(url, { method, body, headers });
@@ -14,28 +15,25 @@ const request = async(url, method = 'GET', body = null, headers = { 'X-Leeloo-Au
     }
 }
 
-// Get Users List
+// Get list of users
 const getListOfUsers = async(req, res, next) => {
     try {
         const { offset } = req.query;
-
         const offsetNumber = offset || 0;
         const url = `${API_URL}accounts?offset=${offsetNumber}&limit=${RESULTS_PER_PAGE}`;
         const { data } = await request(url);
 
-        // Update array of users according to the task
         const usersArray = [];
         for (const user of data) {
             const { id } = user;
-            const { data, included } = await getUserById(id); // Receive object with user info
-            const { name, from, email, links, createdAt: userCreatedAt } = data; // User info destructuring
+            const { data, included } = await getUserById(id);
+            const { name, from, email, links, createdAt: userCreatedAt } = data;
             const { orders } = links;
 
-            // Update orders array according to the task
             let updatedOrders;
             if (orders.length > 0) {
                 updatedOrders = orders.map((order, index) => {
-                    const { id } = order; // Order Id
+                    const { id } = order;
                     const { price, currency, status, updatedAt: orderUpdatedAt } = included.orders[index];
                     const timeToOrderAfterRegister = Math.floor((new Date(orderUpdatedAt) - new Date(userCreatedAt)) / 1000);
 
