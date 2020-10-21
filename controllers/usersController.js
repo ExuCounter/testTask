@@ -20,7 +20,7 @@ const getListOfUsers = async(req, res, next) => {
     let usersInfo = [];
     try {
         const { offset } = req.query;
-        const offsetNumber = offset || 0;
+        const offsetNumber = 5;
         const url = `${API_URL}accounts?offset=${offsetNumber}&limit=${RESULTS_PER_PAGE}`;
 
         const { data } = await request(url);
@@ -74,7 +74,6 @@ const getListOfUsers = async(req, res, next) => {
             })
         } catch (error) {
             console.error('Invalid users requests');
-            throw new Error('Invalid users requests');
         }
     } catch (error) {
         console.error('Invalid request for list of the users')
