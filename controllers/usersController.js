@@ -33,6 +33,7 @@ const getListOfUsers = async(req, res, next) => {
                     const { data, included } = user;
                     const { id, name, from, email, links, createdAt: userCreatedAt } = data;
                     const { orders } = links || {};
+
                     if (!id) {
                         throw new Error('Invalid user ID');
                     }
@@ -82,6 +83,9 @@ const getListOfUsers = async(req, res, next) => {
         res.status(200).send(usersInfo);
     }
 }
+
+// Возможно это совершенно неверный подход с такой вложенностью и проверками,
+// но буду очень рад если вы обьясните как это сделать правильно ( или любая подсказка ).
 
 // Get user by id
 const getUserById = async(id) => {
