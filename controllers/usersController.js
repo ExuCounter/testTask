@@ -23,11 +23,12 @@ const getListOfUsers = async(req, res, next) => {
         const url = `${API_URL}accounts?offset=${offsetNumber}&limit=${RESULTS_PER_PAGE}`;
         const { data } = await request(url);
 
-        const usersArray = [];
-        for (const user of data) {
-            const { id } = user;
-            const { data, included } = await getUserById(id);
-            const { name, from, email, links, createdAt: userCreatedAt } = data;
+        const usersRequests = data.map(user => getUserById(user.id));
+        const users = await Promise.all(usersRequests);
+
+        let usersInfo = users.map(user => {
+            const { data, included } = user;
+            const { id, name, from, email, links, createdAt: userCreatedAt } = data;
             const { orders } = links;
 
             let updatedOrders;
@@ -41,15 +42,16 @@ const getListOfUsers = async(req, res, next) => {
                 })
             }
 
-            usersArray.push({
+            return {
                 id,
                 name,
                 from,
                 email,
                 orders: updatedOrders
-            });
-        }
-        res.status(200).send(usersArray);
+            }
+        })
+
+        res.status(200).send(usersInfo);
     } catch (error) {
         res.status(500).send(error.message);
     }
