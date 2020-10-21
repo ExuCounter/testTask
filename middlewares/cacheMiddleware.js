@@ -9,7 +9,6 @@ const updateCache = (req, res, next) => {
         }
         cacheArray.push(query);
         cache.put('Last 10 queries', cacheArray);
-        console.log('Queries in the cache: ' + cache.get('Last 10 queries'));
         next();
     } catch (error) {
         next(error.message);
